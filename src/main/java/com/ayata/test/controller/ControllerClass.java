@@ -1,5 +1,7 @@
 package com.ayata.test.controller;
 
+import com.ayata.test.model.Dept;
+import com.ayata.test.model.Employee;
 import com.ayata.test.model.User;
 import com.ayata.test.repo.DatabaseRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
 @RestController
 public class ControllerClass {
@@ -59,6 +61,32 @@ public class ControllerClass {
     */
 
     @GetMapping("/getAllUsers")
+    public List<Employee> getAllUsers(){
+        return databaseRepo.findAll();
+    }
+
+    @GetMapping("getUser/{id}")
+    public Optional<Employee> getEmployee(@PathVariable String id){
+        return databaseRepo.findById(Integer.valueOf(id));
+    }
+
+    @PostMapping("/addUser/{id}/{name}/{deptId}")
+    public String addUser(@PathVariable String id, @PathVariable String name, @PathVariable String deptId){
+        databaseRepo.save(new Employee(Integer.parseInt(id), name, new Dept()));
+        return "added";
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    public String deleteUser(@PathVariable String id){
+        databaseRepo.deleteById(Integer.parseInt(id));
+        return "removed";
+    }
+
+    /*
+
+    This methods are used for normal table
+
+    @GetMapping("/getAllUsers")
     public List<User> getAllUsers(){
         return databaseRepo.findAll();
     }
@@ -74,4 +102,5 @@ public class ControllerClass {
         databaseRepo.deleteById(Integer.parseInt(id));
         return "removed";
     }
+     */
 }
