@@ -1,106 +1,46 @@
 package com.ayata.test.controller;
 
-import com.ayata.test.model.Dept;
+import com.ayata.test.model.Comments;
 import com.ayata.test.model.Employee;
+import com.ayata.test.model.Tutorial;
 import com.ayata.test.model.User;
+import com.ayata.test.repo.CrudRepo;
 import com.ayata.test.repo.DatabaseRepo;
+import com.ayata.test.repo.OneToManyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class ControllerClass {
-    ArrayList<User> list;
+    CrudRepo crudRepo;
+    ControllerClass(){
+        crudRepo = new CrudRepo() ;
+    }
 
     @Autowired
-    private DatabaseRepo databaseRepo;
+    OneToManyRepo oneToManyRepo;
 
-    @RequestMapping("/")
-    public ModelAndView firstPage(){
-        return new ModelAndView("redirect:/login.jsp");
+    @GetMapping("/getUser/{id}")
+    public Employee getUser(@PathVariable String id){
+        return crudRepo.findById(Integer.parseInt(id));
     }
-
-    @PostMapping(value = "/")
-    public void getLogindata(User user)
-    {
-        System.out.println(user.getUsername() +" "+ user.getPassword()+"");
-    }
-
-    /*
-    @GetMapping("/getAllUsers")
-    public List<User> getAllUsers(){
-        return list;
-    }
-
-    @PostMapping("/addUser/{name}/{password}")
-    public String addUser(@PathVariable("name") String username, @PathVariable String password){
-        list.add(new User(username, ""+Math.random()));
-        return "added";
-    }
-
-    @DeleteMapping("/deleteUser/{name}/{password}")
-    public String deleteUser(@PathVariable String name, @PathVariable String password){
-        list.remove(new User(name,password));
-        return "removed";
-    }
-
-    @PutMapping("/updatePassword/{name}/{password}")
-    public String updateUsername(@PathVariable String name, @PathVariable String password){
-        for(int i=0; i<list.size(); i++){
-            if(list.get(i).getUsername().equals(name)){
-                list.get(i).setPassword(password);
-                break;
-            }
-        }
-        return "updated";
-    }
-    */
 
     @GetMapping("/getAllUsers")
     public List<Employee> getAllUsers(){
-        return databaseRepo.findAll();
+        return crudRepo.findAll();
     }
 
-    @GetMapping("getUser/{id}")
-    public Optional<Employee> getEmployee(@PathVariable String id){
-        return databaseRepo.findById(Integer.valueOf(id));
+    @PostMapping("/addUser/{id}/{name}/{deptid}")
+    public void addUser(@PathVariable String id, @PathVariable String name, @PathVariable String deptid){
+        crudRepo.save(new Employee(Integer.parseInt(id), name, crudRepo.getDept(Integer.parseInt(deptid))));
     }
 
-    @PostMapping("/addUser/{id}/{name}/{deptId}")
-    public String addUser(@PathVariable String id, @PathVariable String name, @PathVariable String deptId){
-        databaseRepo.save(new Employee(Integer.parseInt(id), name, new Dept()));
-        return "added";
+    @GetMapping("/getAllComments")
+    public List<Comments> getAllComments(){
+        return oneToManyRepo.findAll();
     }
-
-    @DeleteMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable String id){
-        databaseRepo.deleteById(Integer.parseInt(id));
-        return "removed";
-    }
-
-    /*
-
-    This methods are used for normal table
-
-    @GetMapping("/getAllUsers")
-    public List<User> getAllUsers(){
-        return databaseRepo.findAll();
-    }
-
-    @PostMapping("/addUser/{name}/{password}")
-    public String addUser(@PathVariable("name") String username, @PathVariable String password){
-        databaseRepo.save(new User(20790423, username, password));
-        return "added";
-    }
-
-    @DeleteMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable String id){
-        databaseRepo.deleteById(Integer.parseInt(id));
-        return "removed";
-    }
-     */
 }
